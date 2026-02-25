@@ -23,6 +23,12 @@ static void (*_MRMediaRemoteGetNowPlayingApplicationIsPlaying)(
     dispatch_queue_t queue,
     MRMediaRemoteGetNowPlayingApplicationIsPlayingCompletion completion);
 
+static void (*_MRMediaRemoteGetNowPlayingClients)(
+    dispatch_queue_t queue,
+    MRMediaRemoteGetNowPlayingClientsCompletion completion);
+
+
+
 // Symbol names
 static const char *const MRMediaRemoteSendCommandName = "MRMediaRemoteSendCommand";
 static const char *const MRMediaRemoteSetElapsedName =
@@ -41,6 +47,8 @@ static const char *const MRMediaRemoteGetNowPlayingApplicationPIDName =
     "MRMediaRemoteGetNowPlayingApplicationPID";
 static const char *const MRMediaRemoteGetNowPlayingApplicationIsPlayingName =
     "MRMediaRemoteGetNowPlayingApplicationIsPlaying";
+static const char *const MRMediaRemoteGetNowPlayingClientsName =
+    "MRMediaRemoteGetNowPlayingClients";
 
 // Keys
 CFStringRef kMRMediaRemoteNowPlayingInfoDidChangeNotification =
@@ -73,6 +81,11 @@ CFStringRef kMRMediaRemoteNowPlayingInfoRepeatMode =
     CFSTR("kMRMediaRemoteNowPlayingInfoRepeatMode");
 CFStringRef kMRMediaRemoteNowPlayingInfoPlaybackRate =
     CFSTR("kMRMediaRemoteNowPlayingInfoPlaybackRate");
+
+CFStringRef kMRMediaRemoteGetNowPlayingClients =
+    CFSTR("kMRMediaRemoteGetNowPlayingClients");
+CFStringRef kMRNowPlayingClientUserInfoKey =
+    CFSTR("kMRNowPlayingClientUserInfoKey");
 
 __attribute__((constructor)) static void initialize_mediaremote() {
     void *mr_framework_handle = dlopen(MR_FRAMEWORK_PATH, RTLD_LAZY);
@@ -107,6 +120,9 @@ __attribute__((constructor)) static void initialize_mediaremote() {
 
     _MRMediaRemoteGetNowPlayingApplicationIsPlaying = dlsym(
         mr_framework_handle, MRMediaRemoteGetNowPlayingApplicationIsPlayingName);
+    
+    _MRMediaRemoteGetNowPlayingClients = dlsym(
+        mr_framework_handle, MRMediaRemoteGetNowPlayingClientsName);
 }
 
 // Public API implementations
@@ -167,5 +183,12 @@ void MRMediaRemoteGetNowPlayingApplicationIsPlaying(
     MRMediaRemoteGetNowPlayingApplicationIsPlayingCompletion completion) {
     if (_MRMediaRemoteGetNowPlayingApplicationIsPlaying) {
         _MRMediaRemoteGetNowPlayingApplicationIsPlaying(queue, completion);
+    }
+}
+
+
+void MRMediaRemoteGetNowPlayingClients(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingClientsCompletion completion) {
+    if (_MRMediaRemoteGetNowPlayingClients) {
+        _MRMediaRemoteGetNowPlayingClients(queue, completion);
     }
 }

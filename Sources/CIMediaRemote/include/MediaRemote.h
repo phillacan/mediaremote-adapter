@@ -70,6 +70,10 @@ extern CFStringRef kMRMediaRemoteOptionStationHash;
 extern CFStringRef kMRMediaRemoteRouteDescriptionUserInfoKey;
 extern CFStringRef kMRMediaRemoteRouteStatusUserInfoKey;
 
+
+extern CFStringRef kMRMediaRemoteGetNowPlayingClients;
+extern CFStringRef kMRNowPlayingClientUserInfoKey;
+
 #pragma mark - API
 typedef enum {
     kMRPlay = 0,
@@ -103,9 +107,13 @@ typedef void (^MRMediaRemoteGetNowPlayingInfoCompletion)(CFDictionaryRef informa
 typedef void (^MRMediaRemoteGetNowPlayingApplicationPIDCompletion)(int PID);
 typedef void (^MRMediaRemoteGetNowPlayingApplicationIsPlayingCompletion)(Boolean isPlaying);
 
+typedef void (^MRMediaRemoteGetNowPlayingClientsCompletion)(CFArrayRef clients);
+
 void MRMediaRemoteGetNowPlayingApplicationPID(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingApplicationPIDCompletion completion);
 void MRMediaRemoteGetNowPlayingInfo(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingInfoCompletion completion);
 void MRMediaRemoteGetNowPlayingApplicationIsPlaying(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingApplicationIsPlayingCompletion completion);
+void MRMediaRemoteGetNowPlayingClients(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingClientsCompletion completion);
+
 
 #if __cplusplus
 }

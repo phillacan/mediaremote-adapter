@@ -19,14 +19,16 @@ public class MediaController {
     private var seekTimer: Timer?
     private var eventCount = 0
     private let restartThreshold = 100
-
+    
+    public var debounce: Bool
     public var onTrackInfoReceived: ((TrackInfo?) -> Void)?
     public var onListenerTerminated: (() -> Void)?
     public var onDecodingError: ((Error, Data) -> Void)?
     public var onPlaybackTimeUpdate: ((_ elapsedTime: TimeInterval) -> Void)?
     public var bundleIdentifier: String?
 
-    public init(bundleIdentifier: String? = nil) {
+    public init(debounce: Bool = true, bundleIdentifier: String? = nil) {
+        self.debounce = debounce
         self.bundleIdentifier = bundleIdentifier
     }
 
@@ -60,10 +62,14 @@ public class MediaController {
 
         do {
             try process.run()
+            print("I've gotten here")
             process.waitUntilExit()
-
+            print("and here")
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            print("got?")
+            print(outputData)
             let output = String(data: outputData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            print(output ?? "No output")
 
             let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
             let errorOutput = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -173,7 +179,7 @@ public class MediaController {
             arguments.append("--id")
             arguments.append(bundleId)
         }
-        arguments.append(contentsOf: [libraryPath, "loop"])
+        arguments.append(contentsOf: [libraryPath, debounce ? "loop" : "loop_no_debounce"])
         listeningProcess?.arguments = arguments
 
         let outputPipe = Pipe()
@@ -215,6 +221,7 @@ public class MediaController {
                     self.eventCount += 1
 
                     do {
+                       // print(try String(data: lineData, encoding: .utf8))
                         let trackInfo = try JSONDecoder().decode(TrackInfo.self, from: lineData)
                         DispatchQueue.main.async {
                             // Check if we need to restart after processing
@@ -292,6 +299,24 @@ public class MediaController {
     public func stop() {
         DispatchQueue.global(qos: .userInitiated).async {
             self.runPerlCommand(arguments: ["stop"])
+        }
+    }
+    
+    public func getActiveClients(_ completion: @escaping ([BundleInfo]) -> Void) {
+        let (output, _, _) = self.runPerlCommand(arguments: ["get_active_bids"])
+        if let output, !output.isEmpty {
+            do {
+                let outputArray = try JSONDecoder().decode([String].self, from: Data(output.utf8))
+                let bids = try outputArray.map {
+                    try BundleInfo(using: $0)
+                }
+                DispatchQueue.main.async { completion(bids) }
+            } catch {
+                DispatchQueue.main.async { completion([]) }
+            }
+            
+        } else {
+            DispatchQueue.main.async { completion([]) }
         }
     }
 

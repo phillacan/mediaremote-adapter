@@ -20,6 +20,7 @@
 static CFRunLoopRef _runLoop = NULL;
 static dispatch_queue_t _queue;
 static dispatch_block_t _debounce_block = NULL;
+static dispatch_block_t _block = NULL; // redundant for clrity
 static NSString *_targetBundleIdentifier = NULL;
 static pid_t _parentPID = 0;
 static dispatch_source_t _parentMonitorTimer = NULL;
@@ -336,6 +337,39 @@ void loop(void) {
       // Schedule the new block to run after a 100ms delay.
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), _queue, _debounce_block);
     };
+      
+    
+    [[NSNotificationCenter defaultCenter]
+        addObserverForName:(NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification
+                    object:nil
+                     queue:nil
+                usingBlock:handler];
+    
+
+    CFRunLoopRun();
+}
+
+void loop_no_debounce(void) {
+    _runLoop = CFRunLoopGetCurrent();
+
+    MRMediaRemoteRegisterForNowPlayingNotifications(
+        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
+
+    // --- Initial Fetch ---
+    dispatch_async(_queue, ^{
+        fetchAndProcess(0);
+    });
+    
+    // no debounce, repeats or dropouts must be handled by user
+    void (^handler)(NSNotification *) = ^(NSNotification *notification) {
+        _block = dispatch_block_create(0, ^{
+            id pidValue = notification.userInfo[(NSString *)kMRMediaRemoteNowPlayingApplicationPIDUserInfoKey];
+            int pid = (pidValue != nil) ? [pidValue intValue] : 0;
+            fetchAndProcess(pid);
+        });
+        dispatch_async(_queue, _block);
+    };
+
     
     [[NSNotificationCenter defaultCenter]
         addObserverForName:(NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification
@@ -345,6 +379,7 @@ void loop(void) {
 
     CFRunLoopRun();
 }
+
 
 void play(void) {
     MRMediaRemoteSendCommand(kMRPlay, nil);
@@ -435,3 +470,52 @@ void get(void) {
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     }
 } 
+
+
+void get_active_bids(void) {
+
+    __block BOOL completed = NO;
+
+    MRMediaRemoteGetNowPlayingClients(_queue, ^(CFArrayRef clients) {
+        if (clients == NULL) {
+            printOut(@"[]");
+            completed = YES;
+            return;
+        }
+
+        NSArray *clientsArray = [(__bridge NSArray *)clients copy];
+        NSMutableArray *result = [NSMutableArray arrayWithCapacity:clientsArray.count];
+        for (id client in clientsArray) {
+            [result addObject:([client description] ?: @"")];
+        }
+
+        NSError *error = nil;
+        NSData *serialized = [NSJSONSerialization dataWithJSONObject:result
+                                                             options:0
+                                                               error:&error];
+        if (!serialized) {
+            printOut(@"[]");
+            completed = YES;
+            return;
+        }
+
+        NSString *json = [[NSString alloc] initWithData:serialized
+                                               encoding:NSUTF8StringEncoding];
+        if (json == nil) {
+            printOut(@"[]");
+            completed = YES;
+            return;
+        }
+        // form of "bid-pid (name)" to be parsed swift-side
+        printOut(json);
+        completed = YES;
+    });
+
+    NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    while (!completed && [[NSDate date] compare:timeout] == NSOrderedAscending) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    }
+    if (!completed) {
+        printOut(@"[]");
+    }
+}

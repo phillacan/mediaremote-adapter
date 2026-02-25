@@ -78,6 +78,9 @@ install_xsub("set_shuffle_mode", $libref);
 install_xsub("set_repeat_mode", $libref);
 install_xsub("get", $libref);
 
+install_xsub("get_active_bids", $libref);
+install_xsub("loop_no_debounce", $libref);
+
 # 4. Call the bootstrap function to initialize the C code.
 bootstrap();
 
@@ -113,6 +116,10 @@ if ($command eq 'loop') {
     set_repeat_mode();
 } elsif ($command eq 'get') {
     get();
+} elsif ($command eq 'get_active_bids') {
+    get_active_bids();
+} elsif ($command eq 'loop_no_debounce') {
+    loop_no_debounce();
 } else {
     die "Unknown command: $command\n";
 }
