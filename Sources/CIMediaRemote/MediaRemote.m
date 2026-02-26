@@ -26,6 +26,8 @@ static void (*_MRMediaRemoteGetNowPlayingApplicationIsPlaying)(
 static void (*_MRMediaRemoteGetNowPlayingClients)(
     dispatch_queue_t queue,
     MRMediaRemoteGetNowPlayingClientsCompletion completion);
+static void (*_MRMediaRemoteSetOverriddenNowPlayingApplication)(CFStringRef bundleID);
+static void (*_MRMediaRemoteSetNowPlayingApplicationOverrideEnabled)(Boolean enabled);
 
 
 
@@ -47,8 +49,13 @@ static const char *const MRMediaRemoteGetNowPlayingApplicationPIDName =
     "MRMediaRemoteGetNowPlayingApplicationPID";
 static const char *const MRMediaRemoteGetNowPlayingApplicationIsPlayingName =
     "MRMediaRemoteGetNowPlayingApplicationIsPlaying";
+
 static const char *const MRMediaRemoteGetNowPlayingClientsName =
     "MRMediaRemoteGetNowPlayingClients";
+static const char *const MRMediaRemoteSetNowPlayingApplicationOverrideEnabledName =
+    "MRMediaRemoteSetNowPlayingApplicationOverrideEnabled";
+static const char *const MRMediaRemoteSetOverriddenNowPlayingApplicationName =
+    "MRMediaRemoteSetOverriddenNowPlayingApplication";
 
 // Keys
 CFStringRef kMRMediaRemoteNowPlayingInfoDidChangeNotification =
@@ -121,8 +128,15 @@ __attribute__((constructor)) static void initialize_mediaremote() {
     _MRMediaRemoteGetNowPlayingApplicationIsPlaying = dlsym(
         mr_framework_handle, MRMediaRemoteGetNowPlayingApplicationIsPlayingName);
     
+    
     _MRMediaRemoteGetNowPlayingClients = dlsym(
         mr_framework_handle, MRMediaRemoteGetNowPlayingClientsName);
+    
+    _MRMediaRemoteSetOverriddenNowPlayingApplication = dlsym(
+        mr_framework_handle, MRMediaRemoteSetOverriddenNowPlayingApplicationName);
+    
+    _MRMediaRemoteSetNowPlayingApplicationOverrideEnabled = dlsym(
+        mr_framework_handle, MRMediaRemoteSetNowPlayingApplicationOverrideEnabledName);
 }
 
 // Public API implementations
@@ -192,3 +206,15 @@ void MRMediaRemoteGetNowPlayingClients(dispatch_queue_t queue, MRMediaRemoteGetN
         _MRMediaRemoteGetNowPlayingClients(queue, completion);
     }
 }
+
+
+void MRMediaRemoteSetNowPlayingApplicationOverrideEnabled(Boolean enabled) {
+    if (_MRMediaRemoteSetNowPlayingApplicationOverrideEnabled) {
+        _MRMediaRemoteSetNowPlayingApplicationOverrideEnabled(enabled);
+    }
+}
+void MRMediaRemoteSetOverriddenNowPlayingApplication(CFStringRef bundleID) {
+    if (_MRMediaRemoteSetOverriddenNowPlayingApplication) {
+        _MRMediaRemoteSetOverriddenNowPlayingApplication(bundleID);
+    }
+};

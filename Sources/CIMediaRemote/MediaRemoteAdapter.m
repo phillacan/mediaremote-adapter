@@ -20,7 +20,8 @@
 static CFRunLoopRef _runLoop = NULL;
 static dispatch_queue_t _queue;
 static dispatch_block_t _debounce_block = NULL;
-static dispatch_block_t _block = NULL; // redundant for clrity
+static dispatch_block_t _block = NULL; // redundant for clarity
+static CFStringRef _switch_bundle = NULL;
 static NSString *_targetBundleIdentifier = NULL;
 static pid_t _parentPID = 0;
 static dispatch_source_t _parentMonitorTimer = NULL;
@@ -518,4 +519,33 @@ void get_active_bids(void) {
     if (!completed) {
         printOut(@"[]");
     }
+}
+
+void set_override_enabled(void) {
+    const char *enabledStr = getenv("MEDIAREMOTE_SET_OVERRIDE_ENABLED");
+    if (enabledStr == NULL) {
+        return;
+    }
+
+    int enabled = atoi(enabledStr);
+    MRMediaRemoteSetNowPlayingApplicationOverrideEnabled(enabled > 0);
+}
+
+
+void set_overridden_app(void) {
+    const char *appStr = getenv("MEDIAREMOTE_SET_OVERRIDDEN_APP");
+    if (appStr == NULL) {
+        return;
+    }
+    
+    if (_switch_bundle != NULL) {
+        CFRelease(_switch_bundle);
+    }
+    
+    _switch_bundle = CFStringCreateWithCString(kCFAllocatorDefault, appStr, kCFStringEncodingUTF8);
+    
+    if (_switch_bundle == NULL) {
+        return;
+    }
+    MRMediaRemoteSetOverriddenNowPlayingApplication(_switch_bundle);
 }

@@ -80,6 +80,9 @@ install_xsub("get", $libref);
 
 install_xsub("get_active_bids", $libref);
 install_xsub("loop_no_debounce", $libref);
+install_xsub("set_override_enabled", $libref);
+install_xsub("set_overridden_app", $libref);
+
 
 # 4. Call the bootstrap function to initialize the C code.
 bootstrap();
@@ -120,6 +123,16 @@ if ($command eq 'loop') {
     get_active_bids();
 } elsif ($command eq 'loop_no_debounce') {
     loop_no_debounce();
+} elsif ($command eq 'set_override_enabled') {
+    my $enabled = $ARGV[0];
+    die "Missing argument for set_override_enabled\n " unless defined $enabled;
+    $ENV{'MEDIAREMOTE_SET_OVERRIDE_ENABLED'} = $enabled;
+    set_override_enabled();
+} elsif ($command eq 'set_overridden_app') {
+    my $app = $ARGV[0];
+    die "Missing argument for set_overridden_app\n " unless defined $app;
+    $ENV{'MEDIAREMOTE_SET_OVERRIDDEN_APP'} = $app;
+    set_overridden_app();
 } else {
     die "Unknown command: $command\n";
 }

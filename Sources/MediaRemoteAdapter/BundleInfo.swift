@@ -8,8 +8,8 @@
 import Foundation
 
 public struct BundleInfo: Codable {
-    let bid: String
-    let name: String
+    public let bid: String
+    public let name: String
     
     public init(using description: String) throws {
         let pattern = #"(\S+)-(\d+) \(([^)]+)\)"#

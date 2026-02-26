@@ -28,6 +28,9 @@ void set_repeat_mode(void);
 
 void get_active_bids(void);
 void loop_no_debounce(void);
+void set_override_enabled(void);
+void set_overridden_app(void);
+
 
 #ifdef __cplusplus
 }
