@@ -11,7 +11,6 @@ let package = Package(
             name: "MediaRemoteAdapter",
             type: .dynamic,
             targets: ["MediaRemoteAdapter"]),
-        .executable(name: "adapter-cli", targets: ["AdapterCLI"]),
 
     ],
     dependencies: [],
@@ -34,11 +33,6 @@ let package = Package(
                 .unsafeFlags(["-framework", "Foundation"]),
                 .unsafeFlags(["-framework", "AppKit"])
             ]
-        ),
-        .executableTarget(
-            name: "AdapterCLI",
-            dependencies: ["MediaRemoteAdapter"],
-            path: "Sources/AdapterCLI"
         ),
     ]
 ) 

@@ -102,14 +102,13 @@ void MRMediaRemoteSetShuffleMode(int mode);
 void MRMediaRemoteSetRepeatMode(int mode);
 void MRMediaRemoteRegisterForNowPlayingNotifications(dispatch_queue_t queue);
 void MRMediaRemoteUnregisterForNowPlayingNotifications();
-
 void MRMediaRemoteSetNowPlayingApplicationOverrideEnabled(Boolean enabled);
 void MRMediaRemoteSetOverriddenNowPlayingApplication(CFStringRef bundleID);
+CFArrayRef MRMediaRemoteCopyPickableRoutes(void);
 
 typedef void (^MRMediaRemoteGetNowPlayingInfoCompletion)(CFDictionaryRef information);
 typedef void (^MRMediaRemoteGetNowPlayingApplicationPIDCompletion)(int PID);
 typedef void (^MRMediaRemoteGetNowPlayingApplicationIsPlayingCompletion)(Boolean isPlaying);
-
 typedef void (^MRMediaRemoteGetNowPlayingClientsCompletion)(CFArrayRef clients);
 
 

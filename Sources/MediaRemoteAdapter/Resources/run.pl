@@ -79,9 +79,12 @@ install_xsub("set_repeat_mode", $libref);
 install_xsub("get", $libref);
 
 install_xsub("get_active_bids", $libref);
+install_xsub("get_pickable_routes", $libref);
 install_xsub("loop_no_debounce", $libref);
 install_xsub("set_override_enabled", $libref);
 install_xsub("set_overridden_app", $libref);
+install_xsub("retroactive_pause", $libref);
+install_xsub("switch_app", $libref);
 
 
 # 4. Call the bootstrap function to initialize the C code.
@@ -121,6 +124,8 @@ if ($command eq 'loop') {
     get();
 } elsif ($command eq 'get_active_bids') {
     get_active_bids();
+} elsif ($command eq 'get_pickable_routes') {
+    get_pickable_routes();
 } elsif ($command eq 'loop_no_debounce') {
     loop_no_debounce();
 } elsif ($command eq 'set_override_enabled') {
@@ -133,6 +138,16 @@ if ($command eq 'loop') {
     die "Missing argument for set_overridden_app\n " unless defined $app;
     $ENV{'MEDIAREMOTE_SET_OVERRIDDEN_APP'} = $app;
     set_overridden_app();
+} elsif ($command eq 'retroactive_pause') {
+    my $app = $ARGV[0];
+    die "Missing argument for retroactive_pause\n" unless defined $app;
+    $ENV{'MEDIAREMOTE_RETRO_PAUSE_BUNDLE'} = $app;
+    retroactive_pause();
+} elsif ($command eq 'switch_app') {
+    my $app = $ARGV[0];
+    die "Missing bundle ID for switch_app\n" unless defined $app;
+    $ENV{'MEDIAREMOTE_SWITCH_APP_BUNDLE'} = $app;
+    switch_app();
 } else {
     die "Unknown command: $command\n";
 }

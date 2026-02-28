@@ -320,15 +320,43 @@ public class MediaController {
         }
     }
 
+    public func getPickableRoutes(_ completion: @escaping ([String]) -> Void) {
+        let (output, _, _) = self.runPerlCommand(arguments: ["get_pickable_routes"])
+        if let output, !output.isEmpty {
+            do {
+                let outputArray = try JSONDecoder().decode([String].self, from: Data(output.utf8))
+                DispatchQueue.main.async { completion(outputArray) }
+            } catch {
+                DispatchQueue.main.async { completion([]) }
+            }
+        } else {
+            DispatchQueue.main.async { completion([]) }
+        }
+    }
+    
+    @available(macOS, obsoleted: 10.15, message: "use switchApp() and retroactivePause() directly")
     public func enableAppOverride(enabled: Bool) {
         DispatchQueue.global(qos: .userInitiated).async {
             self.runPerlCommand(arguments: ["set_override_enabled", String(enabled ? 1 : 0)])
         }
     }
     
+    @available(macOS, obsoleted: 10.15, message: "use switchApp() and retroactivePause() directly")
     public func setOverridingApp(bundleID: String) {
         DispatchQueue.global(qos: .userInitiated).async {
             self.runPerlCommand(arguments: ["set_overridden_app", bundleID])
+        }
+    }
+
+    public func retroactivePause(bundleID: String) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.runPerlCommand(arguments: ["retroactive_pause", bundleID])
+        }
+    }
+
+    public func switchApp(bundleID: String) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.runPerlCommand(arguments: ["switch_app", bundleID])
         }
     }
     

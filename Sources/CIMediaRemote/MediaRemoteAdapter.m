@@ -521,6 +521,35 @@ void get_active_bids(void) {
     }
 }
 
+void get_pickable_routes(void) {
+    CFArrayRef routes = MRMediaRemoteCopyPickableRoutes();
+    if (routes == NULL) {
+        printOut(@"[]");
+        return;
+    }
+
+    NSArray *routesArray = [(__bridge NSArray *)routes copy];
+    CFRelease(routes);
+
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:routesArray.count];
+    for (id route in routesArray) {
+        [result addObject:([route description] ?: @"")];
+    }
+
+    NSError *error = nil;
+    NSData *serialized = [NSJSONSerialization dataWithJSONObject:result
+                                                         options:0
+                                                           error:&error];
+    if (!serialized) {
+        printOut(@"[]");
+        return;
+    }
+
+    NSString *json = [[NSString alloc] initWithData:serialized
+                                           encoding:NSUTF8StringEncoding];
+    printOut(json ?: @"[]");
+}
+
 void set_override_enabled(void) {
     const char *enabledStr = getenv("MEDIAREMOTE_SET_OVERRIDE_ENABLED");
     if (enabledStr == NULL) {
@@ -548,4 +577,64 @@ void set_overridden_app(void) {
         return;
     }
     MRMediaRemoteSetOverriddenNowPlayingApplication(_switch_bundle);
+}
+
+void retroactive_pause(void) {
+    const char *appStr = getenv("MEDIAREMOTE_RETRO_PAUSE_BUNDLE");
+    if (appStr == NULL) {
+        return;
+    }
+
+    CFStringRef appID = CFStringCreateWithCString(kCFAllocatorDefault, appStr, kCFStringEncodingUTF8);
+    if (appID == NULL) {
+        return;
+    }
+
+    // idea: override->pause->toggleEnabled
+    // toggle is req. to (1) allow system npi to "fall back" to the new app and
+    // (2) prevent system npi from getting "stuck" (not receiving any npi updates)
+    
+    MRMediaRemoteSetOverriddenNowPlayingApplication(appID);
+    CFRelease(appID);
+    usleep(100000);
+
+    MRMediaRemoteSendCommand(kMRPause, nil);
+    usleep(100000);
+
+    MRMediaRemoteSetNowPlayingApplicationOverrideEnabled(true);
+    usleep(100000);
+
+    MRMediaRemoteSetNowPlayingApplicationOverrideEnabled(false);
+
+}
+
+void switch_app(void) {
+    const char *appStr = getenv("MEDIAREMOTE_SWITCH_APP_BUNDLE");
+    if (appStr == NULL) {
+        return;
+    }
+
+    CFStringRef appID = CFStringCreateWithCString(kCFAllocatorDefault, appStr, kCFStringEncodingUTF8);
+    if (appID == NULL) {
+        return;
+    }
+
+    // idea: switch->pause/play->toggleEnabled
+    // toggling playback "bakes" app npi into system npi
+    // so the override toggle doesn't reset it to the old app
+    
+    MRMediaRemoteSetOverriddenNowPlayingApplication(appID);
+    usleep(100000);
+
+    MRMediaRemoteSendCommand(kMRPause, nil);
+    MRMediaRemoteSendCommand(kMRPlay, nil);
+    usleep(100000);
+
+    MRMediaRemoteSetNowPlayingApplicationOverrideEnabled(true);
+    usleep(100000);
+
+    MRMediaRemoteSetNowPlayingApplicationOverrideEnabled(false);
+    usleep(100000);
+
+    CFRelease(appID);
 }

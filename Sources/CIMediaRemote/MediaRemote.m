@@ -28,6 +28,7 @@ static void (*_MRMediaRemoteGetNowPlayingClients)(
     MRMediaRemoteGetNowPlayingClientsCompletion completion);
 static void (*_MRMediaRemoteSetOverriddenNowPlayingApplication)(CFStringRef bundleID);
 static void (*_MRMediaRemoteSetNowPlayingApplicationOverrideEnabled)(Boolean enabled);
+static CFArrayRef (*_MRMediaRemoteCopyPickableRoutes)(void);
 
 
 
@@ -56,6 +57,8 @@ static const char *const MRMediaRemoteSetNowPlayingApplicationOverrideEnabledNam
     "MRMediaRemoteSetNowPlayingApplicationOverrideEnabled";
 static const char *const MRMediaRemoteSetOverriddenNowPlayingApplicationName =
     "MRMediaRemoteSetOverriddenNowPlayingApplication";
+static const char *const MRMediaRemoteCopyPickableRoutesName =
+    "MRMediaRemoteCopyPickableRoutes";
 
 // Keys
 CFStringRef kMRMediaRemoteNowPlayingInfoDidChangeNotification =
@@ -137,6 +140,9 @@ __attribute__((constructor)) static void initialize_mediaremote() {
     
     _MRMediaRemoteSetNowPlayingApplicationOverrideEnabled = dlsym(
         mr_framework_handle, MRMediaRemoteSetNowPlayingApplicationOverrideEnabledName);
+
+    _MRMediaRemoteCopyPickableRoutes = dlsym(
+        mr_framework_handle, MRMediaRemoteCopyPickableRoutesName);
 }
 
 // Public API implementations
@@ -218,3 +224,10 @@ void MRMediaRemoteSetOverriddenNowPlayingApplication(CFStringRef bundleID) {
         _MRMediaRemoteSetOverriddenNowPlayingApplication(bundleID);
     }
 };
+
+CFArrayRef MRMediaRemoteCopyPickableRoutes(void) {
+    if (_MRMediaRemoteCopyPickableRoutes) {
+        return _MRMediaRemoteCopyPickableRoutes();
+    }
+    return NULL;
+}

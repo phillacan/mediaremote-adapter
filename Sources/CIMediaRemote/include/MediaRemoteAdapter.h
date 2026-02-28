@@ -30,6 +30,9 @@ void get_active_bids(void);
 void loop_no_debounce(void);
 void set_override_enabled(void);
 void set_overridden_app(void);
+void get_pickable_routes(void);
+void retroactive_pause(void);
+void switch_app(void);
 
 
 #ifdef __cplusplus
