@@ -2,25 +2,15 @@
 
 A Swift package for macOS that provides a modern interface for controlling media playback and receiving track information from the private `MediaRemote.framework`.
 
-
 ### What this fork adds
 
-```swift
-import MediaRemoteAdapter
 
-let controller = MediaController(debounce: false) // caller handles messy Now Playing notifications
-
-controller.getActiveClients { bundleArray in
-    bundleArray.map { print("bundle ID: \($0.bid) bundle name: \($0.name)") }
-} // (e.g. "bundle ID: com.spotify.client bundle name: Spotify")
-
-// switches Now Playing source to Soundcloud
-controller.switchApp(bundleID: "com.soundcloud.Soundcloud")
-
-// attempts to pause Spotify and to return previous app to Now Playing source
-controller.retroactivePause(bundleID: "com.spotify.client") 
-
-```
+| Feature | Description |
+|--------|-------------|
+| `MediaController(debounce: Bool)` | Optional debounce in the listener (caller handles messy Now Playing notifications). |
+| `getActiveClients { [BundleInfo] in ... }` | Get Now Playing active clients (bundle ID + name). |
+| `switchApp(bundleID: String)` | Attempts to switch Now Playing source to app with specified bundle ID. |
+| `retroactivePause(bundleID:)` | Attempts to pause `bundleID` app, then switch source back to currently playing app. |
 
 
 
