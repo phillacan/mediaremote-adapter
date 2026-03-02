@@ -2,6 +2,29 @@
 
 A Swift package for macOS that provides a modern interface for controlling media playback and receiving track information from the private `MediaRemote.framework`.
 
+
+### What this fork adds
+
+```swift
+import MediaRemoteAdapter
+
+let controller = MediaController(debounce: false) // caller handles messy Now Playing notifications
+
+controller.getActiveClients { bundleArray in
+    bundleArray.map { print("bundle ID: \($0.bid) bundle name: \($0.name)") }
+} // (e.g. "bundle ID: com.spotify.client bundle name: Spotify")
+
+// switches Now Playing source to Soundcloud
+controller.switchApp(bundleID: "com.soundcloud.Soundcloud")
+
+// attempts to pause Spotify and to return previous app to Now Playing source
+controller.retroactivePause(bundleID: "com.spotify.client") 
+
+```
+
+
+
+
 ## Installation
 
 Add `MediaRemoteAdapter` to your project using Swift Package Manager.
