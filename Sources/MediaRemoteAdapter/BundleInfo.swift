@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct BundleInfo: Codable {
+public struct BundleInfo: Codable, Sendable {
     public let bid: String
     public let name: String
     
