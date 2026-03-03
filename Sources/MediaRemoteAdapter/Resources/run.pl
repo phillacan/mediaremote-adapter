@@ -77,6 +77,7 @@ install_xsub("set_time_from_env", $libref);
 install_xsub("set_shuffle_mode", $libref);
 install_xsub("set_repeat_mode", $libref);
 install_xsub("get", $libref);
+install_xsub("get_supported_commands", $libref);
 
 install_xsub("get_active_bids", $libref);
 install_xsub("get_pickable_routes", $libref);
@@ -122,6 +123,8 @@ if ($command eq 'loop') {
     set_repeat_mode();
 } elsif ($command eq 'get') {
     get();
+} elsif ($command eq 'get_supported_commands') {
+    get_supported_commands();
 } elsif ($command eq 'get_active_bids') {
     get_active_bids();
 } elsif ($command eq 'get_pickable_routes') {

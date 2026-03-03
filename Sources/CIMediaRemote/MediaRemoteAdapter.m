@@ -550,6 +550,30 @@ void get_pickable_routes(void) {
     printOut(json ?: @"[]");
 }
 
+
+
+void get_supported_commands(void) {
+
+    __block BOOL completed = NO;
+    
+    MRMediaRemoteGetSupportedCommands(_queue, ^(id clientObj) {
+        NSString *payload = (clientObj == nil || clientObj == (id)kCFNull)
+            ? @""
+            : ([clientObj description] ?: @"");
+
+        printOut(payload);
+        completed = YES;
+    });
+
+    NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    while (!completed && [[NSDate date] compare:timeout] == NSOrderedAscending) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    }
+    if (!completed) {
+        printOut(@"[]");
+    }
+}
+
 void set_override_enabled(void) {
     const char *enabledStr = getenv("MEDIAREMOTE_SET_OVERRIDE_ENABLED");
     if (enabledStr == NULL) {

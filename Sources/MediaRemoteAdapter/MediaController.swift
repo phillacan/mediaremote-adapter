@@ -320,6 +320,14 @@ public class MediaController {
         }
     }
 
+    public func getActiveClients() async -> [BundleInfo] {
+        await withCheckedContinuation { continuation in
+            getActiveClients { clients in
+                continuation.resume(returning: clients)
+            }
+        }
+    }
+
     public func getPickableRoutes(_ completion: @escaping ([String]) -> Void) {
         let (output, _, _) = self.runPerlCommand(arguments: ["get_pickable_routes"])
         if let output, !output.isEmpty {
@@ -331,6 +339,20 @@ public class MediaController {
             }
         } else {
             DispatchQueue.main.async { completion([]) }
+        }
+    }
+
+    public func getSupportedCommands(_ completion: @escaping (SupportedCommands) -> Void) {
+        let (output, _, _) = self.runPerlCommand(arguments: ["get_supported_commands"])
+        let parsed = SupportedCommands(from: output ?? "")
+        DispatchQueue.main.async { completion(parsed) }
+    }
+
+    public func getSupportedCommands() async -> SupportedCommands {
+        await withCheckedContinuation { continuation in
+            getSupportedCommands { commands in
+                continuation.resume(returning: commands)
+            }
         }
     }
     

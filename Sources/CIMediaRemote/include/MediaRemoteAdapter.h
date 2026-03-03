@@ -25,6 +25,7 @@ void stop_command(void);
 void set_time_from_env(void);
 void set_shuffle_mode(void);
 void set_repeat_mode(void);
+void get_supported_commands(void);
 
 void get_active_bids(void);
 void loop_no_debounce(void);

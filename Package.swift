@@ -18,6 +18,12 @@ let package = Package(
         .target(
             name: "MediaRemoteAdapter",
             dependencies: ["CIMediaRemote"],
+            sources: [
+                "BundleInfo.swift",
+                "MediaController.swift",
+                "SupportedCommands.swift",
+                "TrackInfo.swift"
+            ],
             resources: [
                 .copy("Resources/run.pl")
             ]

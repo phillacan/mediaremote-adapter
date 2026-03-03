@@ -110,12 +110,14 @@ typedef void (^MRMediaRemoteGetNowPlayingInfoCompletion)(CFDictionaryRef informa
 typedef void (^MRMediaRemoteGetNowPlayingApplicationPIDCompletion)(int PID);
 typedef void (^MRMediaRemoteGetNowPlayingApplicationIsPlayingCompletion)(Boolean isPlaying);
 typedef void (^MRMediaRemoteGetNowPlayingClientsCompletion)(CFArrayRef clients);
+typedef void (^MRMediaRemoteGetSupportedCommandsCompletion)(id clientObj);
 
 
 void MRMediaRemoteGetNowPlayingApplicationPID(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingApplicationPIDCompletion completion);
 void MRMediaRemoteGetNowPlayingInfo(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingInfoCompletion completion);
 void MRMediaRemoteGetNowPlayingApplicationIsPlaying(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingApplicationIsPlayingCompletion completion);
 void MRMediaRemoteGetNowPlayingClients(dispatch_queue_t queue, MRMediaRemoteGetNowPlayingClientsCompletion completion);
+void MRMediaRemoteGetSupportedCommands(dispatch_queue_t queue, MRMediaRemoteGetSupportedCommandsCompletion completion);
 
 
 #if __cplusplus
