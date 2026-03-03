@@ -11,6 +11,9 @@ A Swift package for macOS that provides a modern interface for controlling media
 | `getActiveClients { [BundleInfo] in ... }` | Get Now Playing active clients (bundle ID + name). |
 | `switchApp(bundleID: String)` | Attempts to switch Now Playing source to app with specified bundle ID. |
 | `retroactivePause(bundleID:)` | Attempts to pause `bundleID` app, then switch source back to currently playing app. |
+| `getSupportedCommands { SupportedCommands in ... }` | Gets minimal available commands (exposed by source app). |
+
+`async` implementations of `getActiveClients` and `getSupportedCommands` available. 
 
 
 
