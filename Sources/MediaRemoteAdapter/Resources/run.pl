@@ -157,6 +157,6 @@ if ($command eq 'loop') {
 
 # For single commands, add a tiny sleep. This gives the command time to be processed
 # by the system before this script exits and the pipe closes.
-if ($command ne 'loop') {
+if ($command ne 'loop' && $command ne 'loop_no_debounce') {
     select(undef, undef, undef, 0.01); # Sleep for 100ms
 } 

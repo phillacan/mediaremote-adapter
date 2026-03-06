@@ -62,14 +62,9 @@ public class MediaController {
 
         do {
             try process.run()
-            print("I've gotten here")
             process.waitUntilExit()
-            print("and here")
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
-            print("got?")
-            print(outputData)
             let output = String(data: outputData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
-            print(output ?? "No output")
 
             let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
             let errorOutput = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
